@@ -17,7 +17,7 @@ each data file has three important features:\
   Copyright (C) 2007-2022 Tanzil Project\
   License: Creative Commons Attribution 3.0\
   This copy of the Quran text is carefully produced, highly\
-  verified and continuously monitored by a group of specialists\ 
+  verified and continuously monitored by a group of specialists\
   at Tanzil Project.\
   Please check updates at: http://tanzil.net/updates/
 
