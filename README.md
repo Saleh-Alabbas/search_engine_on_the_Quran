@@ -30,12 +30,12 @@ building a search engine on the Quran that allow us to:
  
 
 ## The Data
-There are 2 data files we are dealing with, one is the arabic Quran\
+There are 2 data files, one is the arabic Quran\
 and the other one is an English translated version of the Quran.
 
 each data file has three important features:\
 1- The number of the chapter (Surah).\
-2- The number of the verse within (Ayah) the chapter.\
+2- The number of the verse (Ayah) within the chapter.\
 3-  the verse either in Arabic or in english.
 
 ### dara sources
