@@ -21,7 +21,7 @@ building a search engine on the Quran that allow us to:\
  ## Search engine
  to achive the goals mentioned above we need to:
  - stem each verse and stem the search word befor searching
-    + The Arabic version was stemmed by Farasa stemmer.
+    + The Arabic version was stemmed by [Farasa stemmer](https://github.com/MagedSaeed/farasapy).
     + The English version was stemmed by nltk stemmer namly PorterStemmer
  - tag all verses discussing a specific concept by a tag, then search by tag to get all these verses.
     + almost manually, firstly by names. For example, if the verse contains "messiah", "son of mary" or "jesus" it will be tagged by "jesus".
