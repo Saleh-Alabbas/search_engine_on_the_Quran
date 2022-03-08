@@ -1,7 +1,7 @@
 # Quranic search engine
 
 ## main goal
-building a search engine on the Quran that allow us to:\
+building a search engine on the Quran that allow us to:
 - find specific verses even if the search word's pronunes are incorrect.
 - find all verses about a specific concept.
 - collect acattered quranic stories together.
