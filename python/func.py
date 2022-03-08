@@ -1,16 +1,18 @@
 #%% Importing needed packages
-import pandas as pd
 import re
+import pandas as pd
+
 
 #
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer
 
 #
 from nltk import word_tokenize
 from nltk.stem.isri import ISRIStemmer
-from farasa.stemmer import FarasaStemmer
 from nltk.stem import PorterStemmer
+
+from sklearn.feature_extraction.text import CountVectorizer
+from farasa.stemmer import FarasaStemmer
 
 from wordcloud import WordCloud
 import arabic_reshaper 
@@ -35,7 +37,7 @@ def cleaning(verse):
     verse = verse.lower()
     verse = re.sub("\[.*?\]","",verse)
     verse = re.sub("[(0-9)]","",verse)
-    verse = re.sub("[-.,;:]","",verse)
+    verse = re.sub("[-.\",';:]","",verse)
     verse = re.sub("  "," ",verse)
     verse = verse.strip()
 
@@ -124,48 +126,100 @@ def tag_by_words_appearance(quran,tags_dictionary, stem= False):
                     break
 
 
-def search(quran,text, stem= False):
+# adjusting our search function to be able to search by English.
+
+def search(text,tashkil=False, stem= False, both_lang=False):
     
-    resulted_columns = ["chapter_num", "verse_num", "verse", "tags"]
+    # importing quran data.
+    quran = pd.read_pickle("../pickle/tagged_quran.pkl")
+    #===========setting up resultant columns and by which languge we search=================#
+    
+    if re.search("[A-Za-z]",text):
+        #search in E_tags and English columns
+        language="English"
+        tags="E_tags"
+
+        if both_lang:
+            # return both languages
+            if tashkil:
+                # return English and Arabic with tashkil
+                resulted_columns=["chapter","chapter_num", "verse_num", "tashkil", "English","E_tags"]
+            else:
+                # return English and Arabic without tashkil
+                resulted_columns=["chapter","chapter_num", "verse_num", "verse", "English","E_tags"]
+        else:
+            # return only English
+            resulted_columns= ["chapter_num", "verse_num", "English","E_tags"]
+    
+    else:
+        # text is not English
+        # search in Arabic tags and verses
+        tags="tags"
+        language="verse"
+        
+        if both_lang:
+            # return both language
+            if tashkil:
+                # return English and Arabic with tashkil
+                resulted_columns=["chapter","chapter_num", "verse_num", "tashkil", "English","tags"]
+            else:
+                # return English and Arabic without tashkil
+                resulted_columns= ["chapter","chapter_num", "verse_num", "verse", "English","tags"]
+        else: 
+            # only Arabic
+
+            if tashkil:
+                # with tashkil
+                resulted_columns= ["chapter","chapter_num", "verse_num", "tashkil","tags"]
+            else:
+                # without tashkil
+                resulted_columns = ["chapter","chapter_num", "verse_num", "verse","tags"]
+    
     df = pd.DataFrame(columns=resulted_columns)
-    #c = 0
-    
-    
+
+
     words_lst = text.split()
-    
+
     # do the stemming only once because it takes time
-    if stem:
+    if stem & (language=="verse"):
         # stemming the text
         stemed_text=FarasaStemmer().stem(text)
         
         # stemming the search words
         stemed_lst=[FarasaStemmer().stem(i) for i in words_lst]
+    elif stem & (language=="English"):
+        return("there is no english stem search")
+        
+
+
+    #================SEARCHING: for search whole text===================#
     
     
     
     # searching for the complite text
     for i in range(quran.shape[0]):
         # check if the text matches a tag of the ith verse
-        if (text in quran.tags.iloc[i]):
+        if (text in quran[tags].iloc[i]):
             df.loc[i] =  quran[resulted_columns].iloc[i]
 
         # check if the text appear in the ith verse
-        if bool(re.search(text, quran.verse.iloc[i])):
+        if bool(re.search(text, quran[language].iloc[i])):
             df.loc[i]= quran[resulted_columns].iloc[i]
-            #c = c + 1 
+
         
         # are we searching for a stemmed version of the text    
         if stem:
             # check if stemmed text matches a tag of the ith verse
-            if (stemed_text in quran.tags.iloc[i]):
+            if (stemed_text in quran[tags].iloc[i]):
                 df.loc[i] =  quran[resulted_columns].iloc[i]
 
             # check if stemmed text appear in the ith verse
-            if bool(re.search(stemed_text, quran.verse.iloc[i])):
+            if bool(re.search(stemed_text, quran.stemmed.iloc[i])):
                 df.loc[i]= quran[resulted_columns].iloc[i]
-                #c = c + 1 
 
 
+
+    #================SEARCHING: for individual search words===================#
 
     # looping over the verses of the Quran
     for i in range(quran.shape[0]):
@@ -174,13 +228,13 @@ def search(quran,text, stem= False):
         for word in words_lst:
 
             # check if a search word matches a tag of the ith verse
-            if (word in quran.tags.iloc[i]):
+            if (word in quran[tags].iloc[i]):
                 df.loc[i] =  quran[resulted_columns].iloc[i]
 
             # check if a search word appear in the ith verse
-            if bool(re.search(word, quran.verse.iloc[i])):
+            if bool(re.search(word, quran[language].iloc[i])):
                 df.loc[i]= quran[resulted_columns].iloc[i]
-                #c = c + 1 
+ 
         
         # are we searching for a stemmed version of the search words.    
         if stem:
@@ -189,19 +243,17 @@ def search(quran,text, stem= False):
             for word in stemed_lst:       
                 
                 # check if a stemmed search word matches a tag of the ith verse
-                if (word in quran.tags.iloc[i]):
+                if (word in quran[tags].iloc[i]):
                     df.loc[i] =  quran[resulted_columns].iloc[i]
 
                 # check if a stemmed search word appear in the ith verse
-                if bool(re.search(word, quran.verse.iloc[i])):
+                if bool(re.search(word, quran.stemmed.iloc[i])):
                     df.loc[i]= quran[resulted_columns].iloc[i]
-                    #c = c + 1
 
-    try:
-        df.drop_duplicates(inplace=True)
-    except:
-        pass
     
     return df
 
 
+
+
+# %%
