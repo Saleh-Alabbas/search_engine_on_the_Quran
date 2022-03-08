@@ -1,6 +1,33 @@
-# topic_modeling_on_the_Quran
-applying NLP techniques to tag each verse (or group of verses) by a label or a topic.
+# Quranic search engine
 
+## main goal
+building a search engine on the Quran that allow us to:\
+- find specific verses even if the search word's pronunes are incorrect.
+- find all verses about a specific concept.
+- collect acattered quranic stories together.
+- allow both Arabic and English search.
+
+## Cleaning The Data
+- usual issues with text data (removing numbers, punctuation, diacritics ...)
+    + re package was used to deal with this problem.
+- Basmalah issue:
+    + at the arabic version there was an extra basmalah attached to each first verse in each chapter.\
+    while the english version has no extra basmalah's.
+        - so I removed the extra basmalahs and added a basmalah before the first verse in each chapter with verse number = 0
+ 
+ ## EDAs
+ - mainly I compared between makki chapters and madani chapters.
+ 
+ ## Search engine
+ to achive the goals mentioned above we need to:
+ - stem each verse and stem the search word befor searching
+    + The Arabic version was stemmed by Farasa stemmer.
+    + The English version was stemmed by nltk stemmer namly PorterStemmer
+ - tag all verses discussing a specific concept by a tag, then search by tag to get all these verses.
+    + almost manually, firstly by names. For example, if the verse contains "messiah", "son of mary" or "jesus" it will be tagged by "jesus".
+    + another approach is to look up (either by graping a quran or otherwise) what verses are discussing Moses stories (for example), note them and then tag them.
+  
+ 
 
 ## The Data
 There are 2 data files we are dealing with, one is the arabic Quran\
